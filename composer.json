@@ -1,16 +1,17 @@
 {
     "name": "vnideas/initial",
     "description": "This is initial of vnideas's packages",
+    "version": "1.0.1",
     "type": "library",
     "keywords": [
         "vnideas",
         "laravel",
         "initial"
     ],
-    "homepage": "https://github.com/vnideas/initial",
+    "homepage": "https://github.com/clackken-vni/vnideas-initial",
     "support": {
-        "issues": "https://github.com/vnideas/initial/issues",
-        "source": "https://github.com/vnideas/initial"
+        "issues": "https://github.com/clackken-vni/vnideas-initial/issues",
+        "source": "https://github.com/clackken-vni/vnideas-initial"
     },
     "license": "MIT",
     "authors": [
