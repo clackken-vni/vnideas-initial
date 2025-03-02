@@ -70,7 +70,7 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Clackken](https://github.com/clackken)
+- [Clackken](https://github.com/clackken-vni)
 - [All Contributors](../../contributors)
 
 ## License
