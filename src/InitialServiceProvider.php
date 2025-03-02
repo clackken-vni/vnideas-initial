@@ -15,20 +15,15 @@ use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Vnideas\Initial\Commands\InitialCommand;
 use Vnideas\Initial\Testing\TestsInitial;
+use Illuminate\Support\Facades\Artisan;
 
 class InitialServiceProvider extends PackageServiceProvider
 {
     public static string $name = 'initial';
-
     public static string $viewNamespace = 'initial';
 
     public function configurePackage(Package $package): void
     {
-        /*
-         * This class is a Package Service Provider
-         *
-         * More info: https://github.com/spatie/laravel-package-tools
-         */
         $package->name(static::$name)
             ->hasCommands($this->getCommands())
             ->hasInstallCommand(function (InstallCommand $command) {
@@ -36,6 +31,13 @@ class InitialServiceProvider extends PackageServiceProvider
                     ->publishConfigFile()
                     ->publishMigrations()
                     ->askToRunMigrations()
+                    ->endWith(function (InstallCommand $command) {
+                        if ($command->confirm('Do you want to run the migrations and seeders now?', true)) {
+                            Artisan::call('migrate', ['--path' => __DIR__ . '/../database/migrations']);
+                            Artisan::call('db:seed', ['--class' => 'Vnideas\\Initial\\Database\\Seeders\\PackageSeeder']);
+                            $command->info('Migrations and seeders executed successfully.');
+                        }
+                    })
                     ->askToStarRepoOnGitHub('vnideas/initial');
             });
 
@@ -57,7 +59,7 @@ class InitialServiceProvider extends PackageServiceProvider
             $package->hasViews(static::$viewNamespace);
         }
 
-        if(file_exists($package->basePath('/../src/Helpers/helpers.php'))) {
+        if (file_exists($package->basePath('/../src/Helpers/helpers.php'))) {
             $this->registerHelpers();
         }
     }
@@ -68,7 +70,6 @@ class InitialServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        // Asset Registration
         FilamentAsset::register(
             $this->getAssets(),
             $this->getAssetPackageName()
@@ -79,19 +80,20 @@ class InitialServiceProvider extends PackageServiceProvider
             $this->getAssetPackageName()
         );
 
-        // Icon Registration
         FilamentIcon::register($this->getIcons());
 
-        // Handle Stubs
         if (app()->runningInConsole()) {
-            foreach (app(Filesystem::class)->files(__DIR__.'/../stubs/') as $file) {
+            foreach (app(Filesystem::class)->files(__DIR__ . '/../stubs/') as $file) {
                 $this->publishes([
                     $file->getRealPath() => base_path("stubs/initial/{$file->getFilename()}"),
                 ], 'initial-stubs');
             }
+
+            $this->publishes([
+                __DIR__ . '/../database/seeders/PackageSeeder.php' => database_path('seeders/PackageSeeder.php'),
+            ], 'initial-seeders');
         }
 
-        // Testing
         Testable::mixin(new TestsInitial);
     }
 
@@ -100,21 +102,11 @@ class InitialServiceProvider extends PackageServiceProvider
         return 'vnideas/initial';
     }
 
-    /**
-     * @return array<Asset>
-     */
     protected function getAssets(): array
     {
-        return [
-            // AlpineComponent::make('initial', __DIR__ . '/../resources/dist/components/initial.js'),
-//            Css::make('initial-styles', __DIR__ . '/../resources/dist/initial.css'),
-//            Js::make('initial-scripts', __DIR__ . '/../resources/dist/initial.js'),
-        ];
+        return [];
     }
 
-    /**
-     * @return array<class-string>
-     */
     protected function getCommands(): array
     {
         return [
@@ -122,43 +114,31 @@ class InitialServiceProvider extends PackageServiceProvider
         ];
     }
 
-    /**
-     * @return array<string>
-     */
     protected function getIcons(): array
     {
         return [];
     }
 
-    /**
-     * @return array<string>
-     */
     protected function getRoutes(): array
     {
         return [];
     }
 
-    /**
-     * @return array<string, mixed>
-     */
     protected function getScriptData(): array
     {
         return [];
     }
 
-    /**
-     * @return array<string>
-     */
     protected function getMigrations(): array
     {
         return [
-            'create_initial_table',
+            'create_vni_packages_table',
         ];
     }
 
     public function registerHelpers(): void
     {
-        $helperFile = __DIR__.'/../src/Helpers/helpers.php';
+        $helperFile = __DIR__ . '/../src/Helpers/helpers.php';
         if (file_exists($helperFile)) {
             require_once $helperFile;
         }

@@ -14,5 +14,10 @@ class VniPackages extends Model
         'version',
         'activated',
         'installed',
+        'install_command',
+    ];
+
+    protected $casts = [
+        'install_command' => 'array',
     ];
 }

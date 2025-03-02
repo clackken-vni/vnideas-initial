@@ -1,6 +1,6 @@
 {
     "name": "vnideas/initial",
-    "description": "This is initial of vnideas's packages",
+    "description": "This is initial package of vnideas's packages",
     "version": "1.0.1",
     "type": "library",
     "keywords": [
@@ -42,7 +42,8 @@
     "autoload": {
         "psr-4": {
             "Vnideas\\Initial\\": "src/",
-            "Vnideas\\Initial\\Database\\Factories\\": "database/factories/"
+            "Vnideas\\Initial\\Database\\Factories\\": "database/factories/",
+            "Vnideas\\Initial\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
@@ -55,7 +56,15 @@
         "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
         "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+        "format": "vendor/bin/pint",
+        "post-install-cmd": [
+            "@php artisan migrate --path=vendor/vnideas/initial/database/migrations --force",
+            "@php artisan db:seed --class=Vnideas\\Initial\\Database\\Seeders\\PackageSeeder --force"
+        ],
+        "post-update-cmd": [
+            "@php artisan migrate --path=vendor/vnideas/initial/database/migrations --force",
+            "@php artisan db:seed --class=Vnideas\\Initial\\Database\\Seeders\\PackageSeeder --force"
+        ]
     },
     "config": {
         "sort-packages": true,
